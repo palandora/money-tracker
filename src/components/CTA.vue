@@ -2,7 +2,7 @@
     <div class="cta-bar">
         <span v-if="showSecondary">Cancel</span>
         <div class="button" @click="action()">
-            <img :src="setImage(currentEntry)" alt="">
+            <img :src="setImage(newEntry.state)" alt="">
         </div>
     </div>
 </template>
@@ -12,7 +12,6 @@ export default {
     name: 'cta-bar',
     data(){
         return {
-            
         }
     },
     props:{
@@ -20,31 +19,42 @@ export default {
             type: Boolean,
             default: true
         },
-        currentEntry: Object,
         createEntry: Function,
-        updateEntry: Function
+        updateEntry: Function,
+        checkInputs: Function
     },
     methods:{
-        setImage(hasEntry){
-            if(hasEntry){
-                return require('../assets/icons/refresh.svg')
-            }else{
+        setImage(existingEntry){
+            if(!this.showSecondary){
                 return require('../assets/icons/add.svg')
+            }else{
+                if(!existingEntry){
+                    return require('../assets/icons/refresh.svg')
+                }else{
+                    return require('../assets/icons/add.svg')
+                }
             }
         },
         action(){
-            if(this.showSecondary){
-                if(this.currentEntry){
-                    console.log("update existing entry")
-                }else{
-                    console.log("add new object")
-                }
+            if(!this.showSecondary){
+                return
             }else{
-                console.log("new empty object")
+                if(!this.newEntry.state){
+                    if(this.checkInputs()){
+                        console.log("update object")
+                    }   
+                }else{
+                    if(this.checkInputs()){
+                        this.$emit('createNewObject')
+                        console.log("new object")
+                    }
+                }
             }
-            
-        }
-    }
+              
+        },
+        
+    },
+    inject: ['newEntry']
     
 }
 </script>

@@ -3,6 +3,7 @@
   :hideInput="hideInput"
   :currentEntry="currentEntry"
   :categories="entries"
+  :addEntry="addEntry"
   />
   <div class="container">
     <div class="categories">
@@ -42,8 +43,9 @@ export default {
   data(){
     return {
       currentCategory: "Overview",
-      showInput: true,
+      showInput: false,
       currentEntry: null,
+      isNewEntry: {state: false},
       entries: {
         Vacation : {
           entries: [],total: 0
@@ -76,10 +78,10 @@ export default {
           entries: [
             {
               title: "Shopping with pamela",
-              category: "Overview",
+              category: "Shopping",
               amount: 200
             }
-          ],total: 0
+          ],total: 200
         }
       }
     }
@@ -87,14 +89,13 @@ export default {
   methods:{
     addEntry(obj){
       try{
+        console.log(obj)
         let objCat = obj.category
-        let category = objCat.toLowerCase()
-        // nee to define in entry mask if amout is added or substracted
-        this.entries[category].total += obj.amount
-        this.entries[category].entries.push(obj)
-
-        this.entries.overview.entries.push(obj)
-        this.entries.overview.total += obj.amount
+        this.entries[objCat].total += obj.amount
+        this.entries[objCat].entries.push(obj)
+        this.entries.Overview.entries.push(obj)
+        this.entries.Overview.total += obj.amount
+        this.hideInput()
       }catch(e){
         console.log(e)
       }
@@ -107,13 +108,22 @@ export default {
     },
     showEntryDetails(obj){
       if(obj == undefined){
-        this.currentEntry = {}
+        console.log("create new ")
+        this.currentEntry = null
         this.showInput = true
+        this.isNewEntry.state = true
       }else{
+        console.log("open existing")
         this.currentEntry = obj
+        this.isNewEntry.state = false
         this.showInput = true
       }
       
+    }
+  },
+  provide(){
+    return {
+      newEntry : this.isNewEntry
     }
   },
   components: {

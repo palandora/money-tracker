@@ -10,8 +10,8 @@
                         <img src="../assets/categories/overview.png" alt="">
                     </div>
                     <div class="desc">
-                        <span>Create new Entry</span>
-                        <span>12.02.1995</span>  
+                        <span>{{setHeadline()}}</span>
+                        <span>{{getCurrentDate()}}</span>  
                     </div>
                 </div>
             </div>
@@ -19,18 +19,28 @@
         </div>
         <div class="wrapper-inputs">
             <div class="input-field">
-                <input v-model="title" type="text" id="title" placeholder="Title">
+                <input v-model="title" type="text" id="title" placeholder="Title" autocomplete="off">
                 <hr>
             </div>
             <div class="input-field">
-                <input v-model="category" type="text" id="category" placeholder="Category">
+                <div class="toggle_dropdown" 
+                :class="[isToggled ? 'show' : '']"
+                @click="toggleDropdown"
+                >
+                    <img src="../assets/icons/caret_down.svg" alt="toggle">
+                </div>
+                
+                <input v-model="category" type="text" id="category" placeholder="Category" readonly>
                 <hr>
-                <div class="dropdown">
+                <div class="dropdown"
+                :class="[isToggled ? 'show' : '']"
+                >
                     <div class="dropdown-item"
-                    v-for="(category,name) in categories" 
-                    v-bind:key="category"
+                    v-for="(category,index) in filteredCateogries" 
+                    :key="index"
+                    @click="selectCategory(category[0])"
                     >
-                        {{name}}
+                        {{category[0]}}
                     </div>
                 </div>
             </div>
@@ -40,7 +50,10 @@
             </div>
         </div>
         
-        <CTA :currentEntry="currentEntry"/>
+        <CTA 
+        :checkInputs="checkInputs"
+        v-on:createNewObject="addEntry({'title': title, 'category' : category, 'amount' : amount})"
+        />
     </div>
 </template>
 
@@ -53,22 +66,74 @@ export default {
         return {
             title: '',
             category: '',
-            amount: null
+            amount: null,
+            isToggled: false
         }
     },
     props: {
         hideInput: Function,
         showInput:Boolean,
         currentEntry: Object,
-        categories:Object
+        categories:Object,
+        addEntry: Function
     },
     methods:{
-        
+        selectCategory(selectedCat){
+            this.category = selectedCat
+            this.toggleDropdown()
+        },
+        toggleDropdown(){
+            this.isToggled ? this.isToggled = false : 
+            this.isToggled = true
+        },
+        getCurrentDate(){
+            const today = new Date()
+            const currentDate = `${today.getDate()}-${today.getMonth()+1}-${today.getFullYear()}`
+            return currentDate
+        },
+        setHeadline(){
+            if(this.newEntry.state){
+                return "Create new Entry"
+            }else{
+                return "Update Entry"
+            }
+        },
+        getCategoriesLength(obj){
+            let keys = Object.keys(obj)
+            let length = keys.length
+            return length
+        },
+        checkInputs(){
+            if(this.title.length > 0 && 
+            this.category.length > 0 && 
+            this.amount != null &&
+            this.amount.toString().length > 0){
+                return true
+            }else{
+                return false
+            }
+        }
+    },
+    computed:{
+        filteredCateogries(){
+            const asArray = Object.entries(this.categories)
+            let counter = 0
+            let filtered = []
+
+            asArray.forEach(item => {
+                counter++
+                if(counter < asArray.length)
+                filtered.push(item)
+            });
+            return filtered
+        }
     },
     watch:{
         currentEntry(obj){
-            if(obj == {}){
-                return
+            if(obj == null){
+                this.title = ""
+                this.category = ""
+                this.amount = null
             }else{
                 this.title = obj.title
                 this.category = obj.category
@@ -76,6 +141,7 @@ export default {
             }
         }
     },
+    inject: ['newEntry'],
     components:{
         CTA
     }
@@ -163,12 +229,26 @@ export default {
         margin-left:16px;
     }
     /* dropdown */
+    .toggle_dropdown{
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+    .toggle_dropdown img{
+        transform-origin: center;
+        transform: rotate(0deg);
+    }
     .dropdown{
         position: absolute;
         z-index: 1;
         left: 16px;
         right: 16px;
-        display:flex;
+        display:none;
         flex-direction: column;
         padding: 6px 0;
         background: white;
@@ -176,9 +256,14 @@ export default {
         box-shadow: 0 0 0 1.5px rgba(0,0,0,.04),
         0 4px 6px rgba(0,0,0,.08);
     }
-    .dropdown.hide{
-        display:none;
+    /*toggled states*/ 
+    .dropdown.show{
+        display:flex;
     }
+    .toggle_dropdown.show img{
+        transform: rotate(180deg);
+    }
+
     .dropdown-item{
         cursor: pointer;
         padding: 8px 16px;
