@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="input-field">
-                <input v-model="amount" type="text" id="amount" placeholder="Amount">
+                <input v-model="amount" type="number" id="amount" placeholder="Amount">
                 <hr>
             </div>
         </div>
@@ -221,6 +221,11 @@ export default {
     }
     input:focus{
        outline: 0;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
     .input-field{
         position: relative;

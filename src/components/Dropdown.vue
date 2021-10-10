@@ -12,13 +12,13 @@
                     </div>
                 </div>
                 <img src="../assets/icons/chevron_down.svg" alt="view details" 
-                :class="[toggled?'toggled':'']"
+                :class="[hidden?'toggled':'']"
                 @click="toggleDropdown"
                 >
             </div>
             <hr>
         </div>
-        <div class="wrapper-dropdown-items" :class="[toggled ? 'hide' : '']">
+        <div class="wrapper-dropdown-items" :class="[hidden ? 'hide' : '']">
             <dropdown-item 
             
             v-for="(category,name) in categories" 
@@ -43,7 +43,7 @@ export default {
         return{
             category: "Overview",
             items: 200,
-            toggled: false
+            hidden: true
         }
     },
     props: {
@@ -57,8 +57,8 @@ export default {
             return require(`../assets/categories/${strg}.png`)
         },
         toggleDropdown(){
-            !this.toggled ? this.toggled = true : 
-            this.toggled = false
+            !this.hidden ? this.hidden = true : 
+            this.hidden = false
         },
         selectItem(propName){
             this.setCategory(propName)
@@ -73,6 +73,9 @@ export default {
 
 <style scoped>
     .wrapper-dropdown{
+        position: fixed;
+        z-index: 10;
+        width: 50%;
         background: var(--ui-bg-categories);
     }
     .dropdown{

@@ -6,13 +6,30 @@
   :addEntry="addEntry"
   />
   <div class="container">
+    <!-- left col -->
     <div class="categories">
       <dropdown 
       :categories="entries" 
       :currentCategory="currentCategory"
       :setCategory="setCurrentCategory"
       />
+      <div class="expense-counter">
+        <span>Total</span>
+        <h1>{{entries[currentCategory].total}}</h1>
+      </div>
+      <div class="stats">
+        <hr>
+        <div class="bounds">
+          <category-tracker
+          v-for="(entry,name) in entries" :key="name" 
+          :currentCategoryName="name"
+          :currentCount="entry.total"
+          :overallCount="entries.Overview.total"
+          />
+        </div>
+      </div>
     </div>
+    <!-- right col -->
     <div class="entries">
       <div class="wrapper-entries">
         <entry 
@@ -37,6 +54,7 @@ import Entry from './components/Entry.vue'
 import Dropdown from './components/Dropdown.vue'
 import Input from './components/Input.vue'
 import CTA from './components/CTA.vue'
+import CategoryTracker from './components/CategoryTracker.vue'
 
 export default {
   name: 'App',
@@ -66,7 +84,7 @@ export default {
               category: "Work",
               amount: 200
             },
-          ],total: 0
+          ],total: 20
         },
         Other : {
           entries: [],total: 0
@@ -130,7 +148,8 @@ export default {
     Entry,
     Dropdown,
     Input,
-    CTA
+    CTA,
+    CategoryTracker
   }
   
 }
@@ -151,6 +170,8 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     position: relative;
+    /*font-size*/ 
+    --h1: 64px;
     /* colors */
     --ui-bg-categories: #2b2b2b;
     --ui-divider:#dedede;
@@ -158,7 +179,13 @@ export default {
     --ui-accent-green:#04c600;
     --ui-accent-delete:#ff2929;
     --txt-headlines: #000;
+    --txt-headlines-light: #fff;
     --txt-sublines:#8d8d8d;
+  }
+  h1{
+    font-size: var(--h1);
+    font-weight: 800;
+    line-height: 74px;
   }
   
   .container{
@@ -171,7 +198,23 @@ export default {
     background: var(--ui-bg-categories);
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    flex-grow: 1;
     width: 50%;
+  }
+  .expense-counter{
+    margin-top: 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow:1;
+  }
+  .expense-counter > *{
+    color: var(--txt-headlines-light);
+  }
+  .expense-counter span {
+    opacity: .5;
   }
   .entries{
     display: flex;
@@ -182,5 +225,14 @@ export default {
     display:flex;
     flex-direction: column;
     flex-grow:1;
+  }
+  .bounds{
+    display: flex;
+    overflow-y: hidden;
+  }
+  hr{
+    border: 0;
+    height: 1px;
+    background: #444;
   }
 </style>
